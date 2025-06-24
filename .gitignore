@@ -6,6 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+
+# (DEP) Testing 
 tests/.node
 
 # Diagnostic reports (https://nodejs.org/api/report.html)

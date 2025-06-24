@@ -6,3 +6,4 @@ tests/
 tsup.config.ts
 tsconfig.json
 LICENSE
+mock/

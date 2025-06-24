@@ -1,17 +1,26 @@
 # Changelog
 
-## [1.0.0] - 2025-06-22
-
+## [1.1.0] - 2025-06-24
 ### Added
-- Initial project setup with TypeScript configuration and build tooling using `tsup`.
-- Implemented a simple `sum(a, b)` function in [`src/index.ts`](src/index.ts).
-- Added unit test for the `sum` function using Vitest in [`tests/sum.test.ts`](tests/sum.test.ts).
-- Provided Prettier configuration and ignore files for consistent code formatting.
-- Included npm scripts for building, testing, linting, and development workflows.
-- Added Apache 2.0 license and project metadata in [`package.json`](package.json).
+- 🎨 `KORDJSChalk` color builder class with full ANSI styling support:
+  - Chainable API (`.red.bold.italic(...)`)
+  - Background color support (`.bgRed`, `.bgBlue`, etc.)
+  - Format support (`.underline`, `.dim`, `.inverse`, etc.)
+  - Unicode icon support (`.icon.check(...)`, `.icon.warning(...)`, etc.)
 
-### Changed
-- N/A
+- 📦 `BoxBuilder` for stylized ASCII/Unicode terminal UI:
+  - Draws framed boxes using `┌─┐` style with dynamic width
+  - Supports `.padding()` and `.border()` customization
+  - `.render()` method for output (auto-render intentionally deferred)
+  - Integrated with color chains via `.box()` method
 
-### Fixed
-- N/A
+- 🔧 Modular project structure:
+  - `src/console/builder.ts` → core color logic
+  - `src/console/codes.ts` → ANSI escape code map
+  - `src/console/styles/box.ts` → `BoxBuilder` class
+  - `src/console/styles/index.ts` → central styles export
+  - `src/index.ts` → unified public export
+
+### Notes
+- This is the initial release and foundation for further features like `box styles`, `center alignment`, and `renderless strings` (toString / Symbol.toPrimitive).
+- `.render()` is currently required when using boxes (by design).
