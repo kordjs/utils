@@ -14,7 +14,7 @@
         "test": "vitest",
         "build": "tsup",
         "pretty": "prettier --write .",
-        "lint": "eslint -c ./eslint.config.mjs",
+        "lint": "eslint",
         "prepare": "npm run pretty && npm run lint && npm run build",
         "start": "tsup && clear && node tests/.node"
     },
