@@ -1,6 +1,6 @@
 export const Themes = {
-    error: ['red', 'bold', 'icon.cross'],
-    success: ['green', 'bold', 'icon.check'],
+    error: ['red', 'bold'],
+    success: ['green', 'bold'],
     warning: ['yellow', 'bold'],
     info: ['cyan']
 };

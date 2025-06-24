@@ -60,7 +60,9 @@ export class KordJSChalk {
 
                 if (prop === 'box') return (text: string) => box(KordJSChalk.create(styles)(text));
 
-                return undefined;
+                return (...args: unknown[]) => {
+                    throw new Error(`Cannot call unknown method or style: ${String(prop)} ${args}`);
+                }
             },
 
             apply(_, __, argArray) {
@@ -71,7 +73,7 @@ export class KordJSChalk {
                 throw new Error('text expects typeof string');
             }
         };
-
+        
         return new Proxy(() => {}, handler) as unknown as Chain;
     }
 }
