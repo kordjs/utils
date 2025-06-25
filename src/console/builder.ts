@@ -1,6 +1,6 @@
 import type { Chain, IconKey, StyleKey } from '../types';
 import { box } from './styles';
-import { Themes } from './misc/themes';
+import { ThemeRegistry } from './misc/themes';
 import { Codes } from './codes';
 import { stripAnsi } from '../utils/console';
 import { Icons } from './misc/icons';
@@ -44,21 +44,26 @@ export class KordJSChalk {
                     });
                 }
 
+                if (prop === 'registerTheme') {
+                    return (name: string, styles: string[]) => {
+                        ThemeRegistry[name] = styles;
+                    };
+                }
+
                 if (prop === 'use') {
-                    return (themeName: keyof typeof Themes): Chain => {
-                        const theme = Themes[themeName];
+                    return (themeName: string): Chain => {
+                        const theme = ThemeRegistry[themeName];
+                        console.log(theme, themeName)
                         if (!theme) throw new Error(`Theme "${themeName}" not found`);
                         let chain = KordJSChalk.create([]);
 
                         for (const style of theme) {
-                            /*if (style.startsWith('icon.')) {
+                            if (style.startsWith('icon.')) {
                                 const iconName = style.split('.')[1];
-                                chain = chain.icon[iconName];
+                                chain = (chain.icons as never)[iconName];
                             } else {
                                 chain = (chain as never)[style];
-                            }*/
-
-                            chain = (chain as never)[style];
+                            }
                         }
 
                         return chain;
