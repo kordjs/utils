@@ -1,17 +1,23 @@
 import { BoxBuilder } from './console/styles';
 import { Codes } from './console/codes';
-import { Themes } from "./console/misc/themes";
+import { Themes } from './console/misc/themes';
+import { Icons } from './console/misc/icons';
 
 export type ThemeKey = keyof typeof Themes;
 
+export type IconKey = keyof typeof Icons;
+
 export type CodeKey = keyof typeof Codes;
 
-export type ColorFn = (text: string) => string;
+export type ColorFn = (...args: unknown[]) => string;
 
 export type Chain = {
     [K in CodeKey]: Chain & ColorFn;
 } & ColorFn & {
-        strip: (text: string) => string;
+        icons: {
+            [K in IconKey]: Chain & ColorFn;
+        };
+        strip: (...args: unknown[]) => string;
         use: (name: ThemeKey) => Chain;
         box: (text: string) => BoxBuilder;
     };

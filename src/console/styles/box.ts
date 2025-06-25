@@ -4,7 +4,7 @@ export class BoxBuilder {
     private content: string;
     private borderChar: string = '-';
     private paddingSize: number = 4;
-    private colorFn: ColorFn = (t: string) => t;
+    private colorFn: ColorFn = (...args: unknown[]) => args.join(' ');
 
     public constructor(content: string) {
         this.content = content;

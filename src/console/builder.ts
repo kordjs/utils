@@ -1,8 +1,9 @@
-import type { Chain, StyleKey } from '../types';
+import type { Chain, IconKey, StyleKey } from '../types';
 import { box } from './styles';
 import { Themes } from './misc/themes';
 import { Codes } from './codes';
 import { stripAnsi } from '../utils/console';
+import { Icons } from './misc/icons';
 
 export class KordJSChalk {
     private styles: StyleKey[];
@@ -11,11 +12,11 @@ export class KordJSChalk {
         this.styles = styles;
     }
 
-    public format(text: string): string {
-        return `${this.styles.join('')}${text}${Codes.reset}`;
+    public format(...args: unknown[]): string {
+        return `${this.styles.join('')}${args}${Codes.reset}`;
     }
 
-    public call = (text: string) => this.format(text);
+    public call = (...args: unknown[]) => this.format(args);
 
     public static create(styles: StyleKey[] = []): Chain {
         const builder = new KordJSChalk(styles);
@@ -29,6 +30,19 @@ export class KordJSChalk {
                 if (prop === 'format') return builder.format.bind(builder);
 
                 if (prop === 'call') return builder.call;
+
+                if (prop === 'icon') {
+                    return new Proxy(() => {}, {
+                        get(_, iconName: string) {
+                            if (!(iconName in Icons)) {
+                                throw new Error(`Unknown icon: ${iconName}`);
+                            }
+
+                            const iconValue = Icons[iconName as IconKey];
+                            return KordJSChalk.create([...styles, iconValue]);
+                        }
+                    });
+                }
 
                 if (prop === 'use') {
                     return (themeName: keyof typeof Themes): Chain => {
@@ -62,18 +76,22 @@ export class KordJSChalk {
 
                 return (...args: unknown[]) => {
                     throw new Error(`Cannot call unknown method or style: ${String(prop)} ${args}`);
-                }
+                };
             },
 
             apply(_, __, argArray) {
-                const [text] = argArray;
+                const combined = argArray
+                    .map((x) => {
+                        if (x instanceof Error) return x.stack || x.message;
+                        if (typeof x === 'object') return JSON.stringify(x, null, 2);
+                        return String(x);
+                    })
+                    .join(' ');
 
-                if (typeof text === 'string') return builder.call(text);
-
-                throw new Error('text expects typeof string');
+                return builder.call(combined);
             }
         };
-        
+
         return new Proxy(() => {}, handler) as unknown as Chain;
     }
 }
