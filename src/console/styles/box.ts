@@ -1,44 +1,98 @@
-import type { ColorFn } from '../../types';
+import type { ColorFn, IBoxBuilder, BoxStyle } from '../../types';
+import { Codes } from '../codes';
+
+const BoxStyles: Record<
+  BoxStyle,
+  {
+    topLeft: string;
+    topRight: string;
+    bottomLeft: string;
+    bottomRight: string;
+    horizontal: string;
+    vertical: string;
+  }
+> = {
+  ascii: {
+    topLeft: '+',
+    topRight: '+',
+    bottomLeft: '+',
+    bottomRight: '+',
+    horizontal: '-',
+    vertical: '|'
+  },
+  rounded: {
+    topLeft: '╭',
+    topRight: '╮',
+    bottomLeft: '╰',
+    bottomRight: '╯',
+    horizontal: '─',
+    vertical: '│'
+  },
+  double: {
+    topLeft: '╔',
+    topRight: '╗',
+    bottomLeft: '╚',
+    bottomRight: '╝',
+    horizontal: '═',
+    vertical: '║'
+  }
+};
 
 export class BoxBuilder {
-    private content: string;
-    private borderChar: string = '-';
-    private paddingSize: number = 4;
-    private colorFn: ColorFn = (...args: unknown[]) => args.join(' ');
+  private content: string;
+  private styleType: BoxStyle = 'ascii';
+  private paddingX = 2;
+  private paddingY = 0;
+  private colorFn: ColorFn = (...args) => args.join(' ');
 
-    public constructor(content: string) {
-        this.content = content;
+  public constructor(content: string) {
+    this.content = content;
+  }
+
+  public style(type: BoxStyle) {
+    if (!(type in BoxStyles)) throw new Error(`Invalid style: ${type}`);
+    this.styleType = type;
+    return this;
+  }
+
+  public padding(x: number, y: number = 0) {
+    this.paddingX = x;
+    this.paddingY = y;
+    return this;
+  }
+
+  public color(fn: ColorFn | keyof typeof Codes) {
+    if (typeof fn === 'string') {
+      const code = Codes[fn];
+      if (!code) throw new Error(`Unknown color code: ${fn}`);
+      this.colorFn = (text) => `${code}${text}${Codes.reset}`;
+    } else {
+      this.colorFn = fn;
     }
+    return this;
+  }
 
-    public border(char: string) {
-        this.borderChar = char;
-        return this;
-    }
+  public toString(): string {
+    const style = BoxStyles[this.styleType];
+    const lines = this.content.split('\n');
 
-    public padding(size: number) {
-        this.paddingSize = size;
-        return this;
-    }
+    const paddedLines = [
+      ...Array(this.paddingY).fill(''),
+      ...lines.map((line) => ' '.repeat(this.paddingX) + line + ' '.repeat(this.paddingX)),
+      ...Array(this.paddingY).fill('')
+    ];
 
-    public color(fn: ColorFn) {
-        this.colorFn = fn;
-        return this;
-    }
+    const width = Math.max(...paddedLines.map((l) => l.length));
+    const horizontal = style.horizontal.repeat(width);
+    const top = `${style.topLeft}${horizontal}${style.topRight}`;
+    const bottom = `${style.bottomLeft}${horizontal}${style.bottomRight}`;
+    const body = paddedLines
+      .map((line) => `${style.vertical}${line.padEnd(width)}${style.vertical}`)
+      .join('\n');
 
-    public render(): string {
-        const lines = this.content.split('\n');
-        const paddedLines = lines.map(
-            (line) => ' '.repeat(this.paddingSize) + line + ' '.repeat(this.paddingSize)
-        );
-        const maxLength = Math.max(...paddedLines.map((l) => l.length));
-        const horizontal = this.borderChar.repeat(maxLength + 2);
-        const top = `┌${horizontal}┐`;
-        const bottom = `└${horizontal}┘`;
-        const body = paddedLines.map((l) => `│ ${l.padEnd(maxLength)} │`).join('\n');
-
-        const fullBox = [top, body, bottom].join('\n');
-        return this.colorFn(fullBox);
-    }
+    const full = [top, body, bottom].join('\n');
+    return this.colorFn(full);
+  }
 }
 
-export const box = (text: string) => new BoxBuilder(text);
+export const box = (text: string): IBoxBuilder => new BoxBuilder(text);
