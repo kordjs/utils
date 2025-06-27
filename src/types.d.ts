@@ -15,17 +15,24 @@ export type BoxStyle = 'ascii' | 'rounded' | 'double';
 
 export type ColorFn = (...args: unknown[]) => string;
 
-export type Chain = {
-  [K in CodeKey]: Chain & ColorFn;
-} & ColorFn & {
-    icons: {
-      [K in IconKey]: Chain & ColorFn;
-    };
-    strip: (...args: unknown[]) => string;
-    use: (name: string) => Chain;
-    box: (text: string) => BoxBuilder;
-    registerTheme: (name: string, styles: ThemeStyle[]) => void;
+export interface IChainColor extends ColorFn {
+  [K in CodeKey]: IChainColor;
+}
+
+export interface IChainIcons {
+  icons: {
+    [K in IconKey]: IChainColor;
   };
+}
+
+export interface IChainUtility {
+  strip: (...args: unknown[]) => string;
+  use: (name: string) => IChain;
+  box: (text: string) => BoxBuilder;
+  registerTheme: (name: string, styles: ThemeStyle[]) => void;
+}
+
+export type Chain = IChainColor & IChainIcons & IChainUtility;
 
 export interface IBoxBuilder {
   style(type: BoxStyle): IBoxBuilder;
@@ -35,3 +42,4 @@ export interface IBoxBuilder {
 }
 
 export type StyleKey = keyof typeof codes | `bg${Capitalize<keyof typeof codes>}`;
+

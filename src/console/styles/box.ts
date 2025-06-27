@@ -50,7 +50,7 @@ export class BoxBuilder {
   }
 
   public style(type: BoxStyle) {
-    if (!(type in BoxStyles)) throw new Error(`Invalid style: ${type}`);
+    if (!(type in BoxStyles)) throw new Error(`Invalid BoxStyle: ${type}`);
     this.styleType = type;
     return this;
   }
