@@ -7,3 +7,8 @@ tsup.config.ts
 tsconfig.json
 LICENSE
 mock/
+eslint.config.mjs
+.prettierignore
+.prettierrc
+README.md
+.vscode/

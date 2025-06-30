@@ -1,6 +1,6 @@
 {
   "name": "@kordjs/utils",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Utility package for kordjs.",
   "main": "dist/index.js",
   "types": "dist/",
@@ -27,7 +27,7 @@
     "template",
     "kordjs"
   ],
-  "author": "0sapphy",
+  "author": "kordjs",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/kordjs/utils/issues"
