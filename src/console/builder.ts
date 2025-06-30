@@ -1,14 +1,39 @@
-import type { Chain, IconKey, StyleKey } from '../types';
-import { box } from './styles';
-import { ThemeRegistry } from './misc/themes';
 import { Codes } from './codes';
-import { stripAnsi } from '../utils/console';
 import { Icons } from './misc/icons';
+import type { ColorFn } from '../types';
+import { BoxBuilder, box as _box } from './styles/box';
+import { KordJSError, ErrorCodes } from '../utils/errors';
+
+/**
+ * Type representing the style keys available.
+ * @typedef {keyof typeof Codes | `bg${Capitalize<keyof typeof Codes>}` | `icon.${keyof typeof Icons}`}
+ * @property {string} TStyleKey - The type of style keys, which can be a key from Codes, a bg Color key or an icon key from Icons.
+ */
+type TStyleKey =
+  | keyof typeof Codes
+  | `bg${Capitalize<keyof typeof Codes>}`
+  | `icon.${keyof typeof Icons}`;
+
+/**
+ * Type representing the chain of styles and icons.
+ * @typedef {Object} TChain
+ */
+type TChain = {
+  [K in keyof typeof Codes]: TChain & ColorFn;
+} & ColorFn & {
+    icons: {
+      [K in keyof typeof Icons]: TChain & ColorFn;
+    };
+
+    format: ColorFn;
+    call: ColorFn;
+    box: (text: string) => BoxBuilder;
+  };
 
 export class KordJSChalk {
-  private styles: StyleKey[];
+  public styles: TStyleKey[];
 
-  public constructor(styles: StyleKey[] = []) {
+  public constructor(styles: TStyleKey[] = []) {
     this.styles = styles;
   }
 
@@ -27,80 +52,45 @@ export class KordJSChalk {
   }
 
   public call = (...args: unknown[]) => this.format(...args);
-
-  public static create(styles: StyleKey[] = []): Chain {
-    const builder = new KordJSChalk(styles);
-
-    const handler: ProxyHandler<object> = {
-      get(_, prop: string) {
-        if (prop in Codes) {
-          return KordJSChalk.create([...styles, Codes[prop as StyleKey as never]]);
-        }
-
-        if (prop === 'format') return builder.format.bind(builder);
-
-        if (prop === 'call') return builder.call;
-
-        if (prop === 'icons') {
-          return new Proxy(() => {}, {
-            get(_, iconName: string) {
-              if (!(iconName in Icons)) {
-                throw new Error(`Unknown icon: ${iconName}`);
-              }
-
-              const iconValue = Icons[iconName as IconKey];
-              return KordJSChalk.create([...styles, iconValue]);
-            }
-          });
-        }
-
-        if (prop === 'registerTheme') {
-          return (name: string, styles: string[]) => {
-            ThemeRegistry[name] = styles;
-          };
-        }
-
-        if (prop === 'use') {
-          return (themeName: string): Chain => {
-            const theme = ThemeRegistry[themeName];
-            if (!theme) throw new Error(`Theme "${themeName}" not found`);
-
-            let chain = KordJSChalk.create([]);
-
-            for (const style of theme) {
-              if (style.startsWith('icon.')) {
-                const iconName = style.split('.')[1];
-                chain = (chain.icons as never)[iconName];
-              } else {
-                chain = (chain as never)[style];
-              }
-            }
-
-            return chain;
-          };
-        }
-
-        if (prop === 'strip') {
-          return (text: string): string => {
-            const styled = KordJSChalk.create(styles)(text);
-            return stripAnsi(styled);
-          };
-        }
-
-        if (prop === 'box') return (text: string) => box(KordJSChalk.create(styles)(text));
-
-        return (...args: unknown[]) => {
-          throw new Error(`Cannot call unknown method or style: ${String(prop)} ${args}`);
-        };
-      },
-
-      apply(_, __, argArray) {
-        return builder.call(...argArray);
-      }
-    };
-
-    return new Proxy(() => {}, handler) as unknown as Chain;
-  }
 }
 
-export const colors: Chain = KordJSChalk.create();
+function createProxy(builder: KordJSChalk): TChain {
+  return new Proxy(builder.call as unknown as object, {
+    get(_, prop: string) {
+      if (prop in Codes) {
+        return createProxy(
+          new KordJSChalk([...builder.styles, Codes[prop as keyof typeof Codes] as TStyleKey])
+        );
+      }
+
+      if (prop in builder) return (builder as never)[prop];
+      if (prop === 'format') return builder.format.bind(builder);
+      if (prop === 'call') return builder.call;
+      if (prop === 'box') return (text: string) => _box(text);
+
+      if (prop === 'icons') {
+        return new Proxy(() => {}, {
+          get(_, iconName: string) {
+            if (!(iconName in Icons)) throw new KordJSError(ErrorCodes.IconNotFound, iconName);
+            return createProxy(
+              new KordJSChalk([
+                ...builder.styles,
+                Icons[iconName as keyof typeof Icons] as TStyleKey
+              ])
+            );
+          }
+        });
+      }
+
+      return () => {
+        throw new KordJSError(ErrorCodes.UnknownProperty, prop);
+      };
+    },
+
+    apply(_, __, argArray) {
+      return builder.call(...argArray);
+    }
+  }) as unknown as TChain;
+}
+
+export const colors: TChain = createProxy(new KordJSChalk());

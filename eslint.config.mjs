@@ -22,5 +22,7 @@ export default defineConfig([
       globals: { ...globals.browser, ...globals.node }
     }
   },
+
+  js.configs.recommended,
   tseslint.configs.recommended
 ]);

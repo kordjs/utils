@@ -1,13 +1,5 @@
 {
-    "editor.fontSize": 18,
-    "editor.minimap.enabled": false,
-
-    "breadcrumbs.enabled": false,
-
-    "geminicodeassist.languages": [
-        "javascript",
-        "typescript",
-        "json",
-        "markdown"
-    ]
+  "editor.fontSize": 18,
+  "editor.minimap.enabled": false,
+  "breadcrumbs.enabled": false
 }

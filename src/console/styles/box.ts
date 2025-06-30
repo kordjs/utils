@@ -1,4 +1,5 @@
-import type { ColorFn, IBoxBuilder, BoxStyle } from '../../types';
+import type { BoxStyle, ColorFn, IBoxBuilder } from '../../types';
+import { KordJSTypeError, ErrorCodes, KordJSError, KordJSRangeError } from '../../utils/errors';
 import { Codes } from '../codes';
 
 const BoxStyles: Record<
@@ -46,29 +47,57 @@ export class BoxBuilder {
   private colorFn: ColorFn = (...args) => args.join(' ');
 
   public constructor(content: string) {
+    if (typeof content !== 'string')
+      throw new KordJSTypeError(ErrorCodes.NoTypeMatch, 'string', typeof content);
+
+    if (content.length === 0) throw new KordJSRangeError(ErrorCodes.EmptyString);
+
     this.content = content;
   }
 
   public style(type: BoxStyle) {
-    if (!(type in BoxStyles)) throw new Error(`Invalid BoxStyle: ${type}`);
+    if (!(type in BoxStyles))
+      throw new KordJSError(
+        ErrorCodes.UnknownStyle,
+        type,
+        Object.keys(BoxStyles)
+          .map((style) => style)
+          .join(', ')
+      );
+
     this.styleType = type;
     return this;
   }
 
-  public padding(x: number, y: number = 0) {
+  public padding(x: number, y: number) {
+    if (typeof x !== 'number' || typeof y !== 'number')
+      throw new KordJSError(
+        ErrorCodes.NoTypeMatch,
+        'number',
+        typeof x !== 'number' ? typeof x : typeof y
+      );
+
     this.paddingX = x;
     this.paddingY = y;
     return this;
   }
 
   public color(fn: ColorFn | keyof typeof Codes) {
+    if (Array.isArray(fn)) throw new KordJSTypeError(ErrorCodes.UnSupportedColorInput);
+
+    if (typeof fn !== 'function' && typeof fn !== 'string')
+      throw new KordJSTypeError(ErrorCodes.NoTypeMatch, 'string || function', typeof fn);
+
     if (typeof fn === 'string') {
       const code = Codes[fn];
-      if (!code) throw new Error(`Unknown color code: ${fn}`);
+
+      if (!code) throw new KordJSError(ErrorCodes.UnknownStyle, fn, Object.keys(Codes).join(', '));
+
       this.colorFn = (text) => `${code}${text}${Codes.reset}`;
     } else {
       this.colorFn = fn;
     }
+
     return this;
   }
 

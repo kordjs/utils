@@ -1,1 +1,0 @@
-export { stripAnsi } from './console';
