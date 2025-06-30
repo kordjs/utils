@@ -1,3 +1,9 @@
+# 💥 1.2.1 - [01725-0055]
+
+## Fixed
+
+- Exported Error related functions.
+
 
 # ✨ 1.2.0 - [30625-2230]
 
