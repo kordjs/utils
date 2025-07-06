@@ -93,6 +93,12 @@ console.log(colors.icons.warn.yellow('Caution!'));
 
 ---
 
+## 🔮 Future Plans
+
+- Seperate the ANSI styling module outside of `@kordjs/utils` into a designated repository.
+
+--- 
+
 > For more advanced examples, see the [documentation](./docs) or [source code](./src).
 
 ---
