@@ -1,4 +1,4 @@
-<div align="center">
+<div>
   <h1>@kordjs/utils</h1>
   <p>
     <b>Advanced, flexible, and type-safe logger for Node.js projects.</b>
@@ -14,7 +14,7 @@
 
 ---
 
-**A modern, expressive, and chainable terminal styling utility for Node.js.**
+> A modern, expressive, and chainable terminal styling utility for Node.js.  
 > **Powerful ANSI formatting, Unicode icons, and ASCII UI components** — all designed to be modular and developer-friendly.
 
 ---
