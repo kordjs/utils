@@ -13,10 +13,11 @@
   },
   "scripts": {
     "test": "vitest",
-    "build": "tsup",
+    "build": "tsup && typedoc",
     "pretty": "prettier --write .",
     "lint": "eslint",
     "prepare": "npm run pretty && npm run lint && npm run build",
+    "release": "release-it --ci",
     "start": "tsup && clear && node tests/.node"
   },
   "repository": {
@@ -34,11 +35,15 @@
   },
   "homepage": "https://github.com/kordjs/utils#readme",
   "devDependencies": {
+    "@release-it/conventional-changelog": "^10.0.1",
     "@types/node": "^24.0.4",
+    "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.29.0",
     "prettier": "^3.5.3",
+    "release-it": "^19.0.3",
     "tsup": "^8.5.0",
     "typedoc": "^0.28.7",
+    "typedoc-material-theme": "^1.4.0",
     "typedoc-plugin-missing-exports": "^4.0.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.1",
