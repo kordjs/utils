@@ -12,3 +12,4 @@ eslint.config.mjs
 .prettierrc
 README.md
 .vscode/
+docs/
