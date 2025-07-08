@@ -4,15 +4,15 @@
  * @typedef {Object} KordJSErrorCodes
  */
 const keys = [
-  // Generic Errors.
-  'UnknownProperty',
-  'NoTypeMatch',
-  'EmptyString',
+    // Generic Errors.
+    'UnknownProperty',
+    'NoTypeMatch',
+    'EmptyString',
 
-  // Focused Errors.
-  'IconNotFound',
-  'UnknownStyle',
-  'UnSupportedColorInput'
+    // Focused Errors.
+    'IconNotFound',
+    'UnknownStyle',
+    'UnSupportedColorInput'
 ];
 
 /**

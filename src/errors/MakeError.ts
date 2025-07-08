@@ -15,46 +15,46 @@ import { MessageGenerator } from './ErrorRegistry';
  * @returns A class extending the specified base error with custom formatting and typed codes.
  */
 export function makeKordJSError<T extends string, B extends new (...args: unknown[]) => Error>(
-  BaseClass: B,
-  name: string,
-  messages: MessageGenerator<T>,
-  formatName?: (base: string, code: string) => string
+    BaseClass: B,
+    name: string,
+    messages: MessageGenerator<T>,
+    formatName?: (base: string, code: string) => string
 ) {
-  //@ts-expect-error Required to bypass TS Mixin signature constraint.
-  return class KordJSError extends BaseClass {
-    public code: T;
+    //@ts-expect-error Required to bypass TS Mixin signature constraint.
+    return class KordJSError extends BaseClass {
+        public code: T;
 
-    /**
-     * Constructs a new instance of the custom error subclass.
-     *
-     * @param code - The error code used to determine the message.
-     * @param args - Arguments passed to the message generator.
-     */
-    constructor(code: T, ...args: unknown[]) {
-      const generator = messages[code];
-      if (!generator) throw new Error(`No message associated with error code: ${code}`);
-      const message = generator(...args);
-      super(message);
+        /**
+         * Constructs a new instance of the custom error subclass.
+         *
+         * @param code - The error code used to determine the message.
+         * @param args - Arguments passed to the message generator.
+         */
+        constructor(code: T, ...args: unknown[]) {
+            const generator = messages[code];
+            if (!generator) throw new Error(`No message associated with error code: ${code}`);
+            const message = generator(...args);
+            super(message);
 
-      this.code = code;
-      Object.setPrototypeOf(this, new.target.prototype);
-      this.name = formatName ? formatName(name, code) : `${name} [${code}]`;
+            this.code = code;
+            Object.setPrototypeOf(this, new.target.prototype);
+            this.name = formatName ? formatName(name, code) : `${name} [${code}]`;
 
-      if (Error.captureStackTrace) {
-        Error.captureStackTrace(this, new.target);
-      }
-    }
+            if (Error.captureStackTrace) {
+                Error.captureStackTrace(this, new.target);
+            }
+        }
 
-    /**
-     * Converts the error to a serializable object.
-     */
-    toJSON() {
-      return {
-        name: this.name,
-        code: this.code,
-        message: this.message,
-        stack: this.stack
-      };
-    }
-  };
+        /**
+         * Converts the error to a serializable object.
+         */
+        toJSON() {
+            return {
+                name: this.name,
+                code: this.code,
+                message: this.message,
+                stack: this.stack
+            };
+        }
+    };
 }

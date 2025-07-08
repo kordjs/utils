@@ -17,5 +17,5 @@ import { Codes } from '..';
  * @returns The formatted error name.
  */
 export function styledErrorName(base: string, code: string): string {
-  return `${Codes.bold}${Codes.yellow}${base} - [${code}]${Codes.reset}`;
+    return `${Codes.bold}${Codes.yellow}${base} - [${code}]${Codes.reset}`;
 }
