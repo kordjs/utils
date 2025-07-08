@@ -1,3 +1,11 @@
+# Changelog
+
+## [1.5.0](https://github.com/kordjs/utils/compare/1.4.0...1.5.0) (2025-07-08)
+
+### Features
+
+* Emoji issue fix. ([05f5783](https://github.com/kordjs/utils/commit/05f5783891d9da78e88db3c4f6560997f323ae95))
+
 ## [1.4.0](https://github.com/kordjs/utils/compare/1.3.0...1.4.0) (2025-07-06)
 
 ### Features
